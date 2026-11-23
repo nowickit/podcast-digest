@@ -166,6 +166,13 @@ footer { border-top: 1px solid var(--line); padding-block: 1.5rem 3rem; color: v
 .channels li span { color: var(--muted); font-size: 0.95rem; }
 .signup { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1.25rem; display: grid; gap: 0.6rem; }
 .signup .addr { font-family: var(--f-display); font-size: 1.2rem; font-weight: 500; }
+.signup .addr a { word-break: break-all; }
+.btn {
+  display: inline-block; background: var(--accent); color: var(--paper); text-decoration: none;
+  font-weight: 600; padding: 0.6rem 1.1rem; border-radius: 6px;
+}
+.btn:hover { filter: brightness(1.08); }
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 </style>
 </head>
 <body>
@@ -225,7 +232,8 @@ footer { border-top: 1px solid var(--line); padding-block: 1.5rem 3rem; color: v
       <span class="label">Zapis</span>
       <h2>Jak się zapisać</h2>
       <div class="signup">
-        <p class="addr">Napisz do mnie, a dopiszę Cię do listy.</p>
+        <p class="addr">Napisz na <a href="mailto:podcast-digest@novvicki.pl?subject=Zapis%20na%20Samo%20sedno&amp;body=Cze%C5%9B%C4%87%2C%0D%0A%0D%0Achc%C4%99%20dostawa%C4%87%20codzienne%20podsumowania%20podcast%C3%B3w%20na%20ten%20adres.%0D%0A%0D%0AImi%C4%99%3A%20%0D%0A">podcast-digest@novvicki.pl</a>, a dopiszę Cię do listy.</p>
+        <p><a class="btn" href="mailto:podcast-digest@novvicki.pl?subject=Zapis%20na%20Samo%20sedno&amp;body=Cze%C5%9B%C4%87%2C%0D%0A%0D%0Achc%C4%99%20dostawa%C4%87%20codzienne%20podsumowania%20podcast%C3%B3w%20na%20ten%20adres.%0D%0A%0D%0AImi%C4%99%3A%20%0D%0A">Zapisz się mailem</a></p>
         <p>Wypisać się możesz w każdej chwili, odpowiadając na dowolny mail z podsumowaniem.</p>
       </div>
       <p>Każdy dostaje osobną wiadomość, więc nikt nie widzi adresów innych osób. Mail przychodzi tylko w dni, w których pojawiły się nowe odcinki.</p>
