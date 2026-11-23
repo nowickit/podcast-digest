@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Podcasty po reklamach</title>
+<meta name="description" content="Codzienny mail z nowymi odcinkami podcastów z YouTube i linkiem do minuty, w której zaczyna się rozmowa.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: jedna kolumna do czytania (~42rem) + szeroka "taśma" osi czasu odcinka w nagłówku */
+:root {
+  --paper: #f4f6f9;
+  --surface: #ffffff;
+  --ink: #17212c;
+  --muted: #5a6878;
+  --line: #d9dfe7;
+  --accent: #1d5f8a;      /* treść / start */
+  --ad: #c4566a;          /* reklama */
+  --teaser: #c08a2e;      /* zapowiedź */
+  --content: #2f7f86;     /* treść */
+  --code-bg: #e9eef4;
+
+  --f-display: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --f-body: "Source Sans 3", "Helvetica Neue", Arial, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #10161d;
+    --surface: #18212b;
+    --ink: #e4eaf1;
+    --muted: #9aa8b8;
+    --line: #2a3644;
+    --accent: #6fb3dd;
+    --ad: #e07c8e;
+    --teaser: #e0ae57;
+    --content: #5fb8bf;
+    --code-bg: #1d2834;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #10161d;
+  --surface: #18212b;
+  --ink: #e4eaf1;
+  --muted: #9aa8b8;
+  --line: #2a3644;
+  --accent: #6fb3dd;
+  --ad: #e07c8e;
+  --teaser: #e0ae57;
+  --content: #5fb8bf;
+  --code-bg: #1d2834;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 42rem; margin: 0 auto; }
+.wide { max-width: 60rem; margin: 0 auto; }
+
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; line-height: 1.15; margin: 0; }
+h1 { font-size: clamp(2.4rem, 7vw, 3.6rem); font-weight: 700; letter-spacing: -0.02em; }
+h2 { font-size: 1.6rem; font-weight: 700; }
+h3 { font-size: 1.1rem; font-weight: 500; }
+p { margin: 0; }
+a { color: var(--accent); }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+code, .mono { font-family: var(--f-mono); font-size: 0.88em; }
+.label {
+  font-family: var(--f-mono); font-size: 0.75rem; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--muted);
+}
+
+/* ---------- nagłówek ---------- */
+header { padding-block: 3.5rem 2.5rem; display: grid; gap: 1.25rem; }
+.lede { font-size: 1.25rem; color: var(--muted); max-width: 36rem; }
+.lede strong { color: var(--ink); font-weight: 600; }
+
+/* ---------- oś czasu odcinka ---------- */
+.tape {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+  padding: 1.25rem 1.25rem 1rem; display: grid; gap: 0.9rem;
+}
+.tape-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem 1rem; align-items: baseline; }
+.tape-head h3 { font-size: 1rem; }
+.track { position: relative; padding-top: 2.1rem; }
+.blocks { display: grid; grid-template-columns: repeat(12, 1fr); gap: 3px; }
+.blk { height: 2.6rem; border-radius: 3px; background: var(--content); opacity: 0.85; }
+.blk.ad { background: var(--ad); opacity: 1; }
+.blk.skip { opacity: 0.35; }
+.ticks { display: grid; grid-template-columns: repeat(12, 1fr); gap: 3px; margin-top: 0.35rem; }
+.ticks span { font-family: var(--f-mono); font-size: 0.68rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.ticks span:nth-child(even) { visibility: hidden; }
+.playhead {
+  position: absolute; top: 0; bottom: 1.4rem; left: calc(100% * 200 / 360);
+  width: 2px; background: var(--ink);
+}
+.playhead b {
+  position: absolute; top: 0; left: 6px; white-space: nowrap;
+  font-family: var(--f-mono); font-size: 0.78rem; font-weight: 600;
+  background: var(--ink); color: var(--paper); padding: 0.1rem 0.4rem; border-radius: 3px;
+}
+.legend { display: flex; flex-wrap: wrap; gap: 0.4rem 1.25rem; font-size: 0.9rem; color: var(--muted); }
+.legend i { display: inline-block; width: 0.8rem; height: 0.8rem; border-radius: 2px; vertical-align: -0.05rem; margin-right: 0.35rem; }
+
+/* ---------- sekcje ---------- */
+main { display: grid; gap: 4rem; padding-block: 1rem 4rem; }
+section { display: grid; gap: 1.1rem; }
+section > p, li { max-width: 65ch; }
+ul, ol { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.5rem; }
+
+/* przykładowy mail */
+.mail { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.mail-head { padding: 0.8rem 1.1rem; border-bottom: 1px solid var(--line); display: grid; gap: 0.15rem; }
+.mail-head .subject { font-weight: 600; }
+.mail-body { padding: 1.1rem; display: grid; gap: 0.8rem; font-size: 0.98rem; }
+.mail-body .ep { font-weight: 600; }
+.mail-body a { word-break: break-all; }
+.mail-body ul { list-style: none; padding: 0; gap: 0.55rem; }
+.mail-body li span { font-family: var(--f-mono); font-size: 0.85rem; color: var(--muted); font-variant-numeric: tabular-nums; margin-right: 0.35rem; }
+
+/* kroki */
+.steps { list-style: none; padding: 0; counter-reset: s; gap: 1rem; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 2.2rem 1fr; gap: 0.75rem; align-items: start; }
+.steps li::before {
+  content: counter(s); font-family: var(--f-mono); font-weight: 600; font-size: 0.9rem;
+  width: 2.2rem; height: 2.2rem; border-radius: 50%; display: grid; place-items: center;
+  border: 1.5px solid var(--accent); color: var(--accent);
+}
+.steps li div { display: grid; gap: 0.2rem; padding-top: 0.15rem; }
+.steps li p { color: var(--muted); }
+
+/* wymagania */
+.req { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1rem; }
+.req > div { border-top: 2px solid var(--line); padding-top: 0.75rem; display: grid; gap: 0.3rem; align-content: start; }
+.req p { color: var(--muted); font-size: 0.97rem; }
+
+pre {
+  margin: 0; background: var(--code-bg); border-radius: 8px; padding: 1rem 1.1rem;
+  overflow-x: auto; font-family: var(--f-mono); font-size: 0.85rem; line-height: 1.7;
+}
+pre .c { color: var(--muted); }
+
+.tip { border-left: 3px solid var(--teaser); padding: 0.2rem 0 0.2rem 1rem; color: var(--muted); }
+.tip strong { color: var(--ink); }
+
+footer { border-top: 1px solid var(--line); padding-block: 1.5rem 3rem; color: var(--muted); font-size: 0.9rem; }
+
+@media (max-width: 480px) {
+  .ticks span:nth-child(4n+3) { visibility: hidden; }
+  .blk { height: 2.1rem; }
+}
+
+.channels { list-style: none; padding: 0; display: grid; gap: 0.6rem; }
+.channels li { display: grid; gap: 0.1rem; border-top: 1px solid var(--line); padding-top: 0.6rem; }
+.channels li span { color: var(--muted); font-size: 0.95rem; }
+.signup { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1.25rem; display: grid; gap: 0.6rem; }
+.signup .addr { font-family: var(--f-display); font-size: 1.2rem; font-weight: 500; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="label">Newsletter dla znajomych · raz dziennie o 19:00</span>
+    <h1>Podcasty po reklamach</h1>
+    <p class="lede">Codzienny mail z nowymi odcinkami podcastów z YouTube. Przy każdym <strong>link do minuty, w której zaczyna się właściwa rozmowa</strong>, już po zapowiedziach i reklamach, krótkie streszczenie i najciekawsze momenty.</p>
+  </header>
+</div>
+
+<div class="wide">
+  <figure class="tape" style="margin:0" aria-label="Pierwsze 6 minut odcinka podzielone na 30-sekundowe bloki">
+    <div class="tape-head">
+      <h3>Good Times Bad Times Polska: „Polska buduje przemysł przyszłości”</h3>
+      <span class="label">pierwsze 6 minut, bloki po 30 s</span>
+    </div>
+    <div class="track">
+      <div class="playhead"><b>start 3:20 → youtu.be/…?t=200</b></div>
+      <div class="blocks">
+        <div class="blk skip" title="0:00 wstęp"></div>
+        <div class="blk skip" title="0:31 wstęp"></div>
+        <div class="blk skip" title="1:02 wstęp"></div>
+        <div class="blk skip" title="1:33 wstęp"></div>
+        <div class="blk ad" title="2:19 reklama konferencji"></div>
+        <div class="blk ad" title="2:50 reklama konferencji"></div>
+        <div class="blk" title="3:20 treść"></div>
+        <div class="blk" title="3:51 treść"></div>
+        <div class="blk" title="4:22 treść"></div>
+        <div class="blk" title="4:53 treść"></div>
+        <div class="blk" title="5:23 treść"></div>
+        <div class="blk" title="5:54 treść"></div>
+      </div>
+      <div class="ticks">
+        <span>0:00</span><span>0:30</span><span>1:00</span><span>1:30</span><span>2:00</span><span>2:30</span>
+        <span>3:00</span><span>3:30</span><span>4:00</span><span>4:30</span><span>5:00</span><span>5:30</span>
+      </div>
+    </div>
+    <div class="legend">
+      <span><i style="background:var(--content);opacity:.35"></i>wstęp przed reklamą</span>
+      <span><i style="background:var(--ad)"></i>reklama konferencji (2:19–3:20)</span>
+      <span><i style="background:var(--content)"></i>właściwa treść</span>
+    </div>
+  </figure>
+</div>
+
+<div class="wrap">
+  <main>
+    <section>
+      <span class="label">Zapis</span>
+      <h2>Jak się zapisać</h2>
+      <div class="signup">
+        <p class="addr">Napisz do mnie, a dopiszę Cię do listy.</p>
+        <p>Wypisać się możesz w każdej chwili, odpowiadając na dowolny mail z podsumowaniem.</p>
+      </div>
+      <p>Każdy dostaje osobną wiadomość, więc nikt nie widzi adresów innych osób. Mail przychodzi tylko w dni, w których pojawiły się nowe odcinki.</p>
+    </section>
+
+    <section>
+      <span class="label">Kanały</span>
+      <h2>Co obserwuję</h2>
+      <ul class="channels">
+        <li><strong>Przemek Górczyk Podcast</strong><span>długie rozmowy z ekspertami: zdrowie, nauka, technologia</span></li>
+        <li><strong>Marcin Iwuć</strong><span>finanse osobiste, inwestowanie, IKE i IKZE</span></li>
+        <li><strong>Good Times Bad Times Polska</strong><span>gospodarka, geopolityka, historia</span></li>
+      </ul>
+      <p>Wszyscy dostają ten sam zestaw. Jeśli chcesz zaproponować kanał, napisz.</p>
+    </section>
+
+    <section>
+      <span class="label">Co przychodzi mailem</span>
+      <h2>Jeden wpis na odcinek</h2>
+      <p>Mail przychodzi raz dziennie o 19:00, tylko gdy pojawiły się nowe odcinki. Poniżej prawdziwy wpis wygenerowany przez model, lekko skrócony.</p>
+      <div class="mail">
+        <div class="mail-head">
+          <span class="subject">Podcasty: nowe odcinki (3)</span>
+          <span class="label">od: Podcasty</span>
+        </div>
+        <div class="mail-body">
+          <p class="ep">▶ Good Times Bad Times Polska: Polska buduje przemysł przyszłości. Od kosmosu po technologie wojskowe.</p>
+          <p><strong>Start po reklamach</strong> (3:20): <a href="https://youtu.be/UVm_wdJ1YLg?t=200">https://youtu.be/UVm_wdJ1YLg?t=200</a></p>
+          <p>Odcinek przedstawia polskie firmy z sektora kosmicznego i obronnego, które dzięki wąskiej specjalizacji zdobywają globalne kontrakty: teleskopy, systemy AI dla satelitów, anteny.</p>
+          <p><strong>Opis a treść:</strong> zgodność wysoka. Opis nie wymienia firm, o których jest odcinek (Scanway, KP Labs, DataWalk), skupia się na promocji magazynu i partnerów.</p>
+          <div>
+            <p><strong>Najciekawsze momenty:</strong></p>
+            <ul>
+              <li><span>5:23</span>Scanway z Wrocławia: teleskopy dla satelitów i kontrakt na mapowanie Księżyca</li>
+              <li><span>7:26</span>KP Labs z Gliwic: komputery pokładowe i AI do przetwarzania danych satelitarnych</li>
+              <li><span>12:08</span>Sybilla Technologies: 71 sensorów śledzących satelity i śmieci kosmiczne</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <p>Gdy YouTube ma już wykres „Najczęściej odtwarzane”, momenty, do których widzowie wracają, dostają dopisek <em>🔥 często odtwarzane</em>.</p>
+    </section>
+
+    <section>
+      <span class="label">Jak to działa</span>
+      <h2>Skąd wiadomo, gdzie zaczyna się rozmowa</h2>
+      <ol class="steps">
+        <li><div><h3>Nowe odcinki</h3><p>Co godzinę sprawdzam kanały. Shorts są pomijane.</p></div></li>
+        <li><div><h3>Transkrypcja</h3><p>Pobieram napisy z YouTube, opis i rozdziały, i dzielę rozmowę na bloki po 30 sekund.</p></div></li>
+        <li><div><h3>Początek rozmowy</h3><p>Model językowy działający na moim komputerze ocenia każdy blok z pierwszych 12 minut: treść, zapowiedź, reklama, autopromocja albo czołówka. Start to pierwsze 3 minuty treści bez przerwy.</p></div></li>
+        <li><div><h3>Streszczenie</h3><p>Na podstawie całej rozmowy powstaje streszczenie, ocena, czy tytuł i opis odpowiadają treści, i 3–6 najciekawszych momentów z czasem.</p></div></li>
+        <li><div><h3>Mail o 19:00</h3><p>Wszystkie nowe odcinki z danego dnia trafiają do jednego maila.</p></div></li>
+      </ol>
+      <p>Wszystko działa lokalnie. Transkrypcje nie trafiają do żadnej usługi w chmurze.</p>
+    </section>
+
+    <section>
+      <span class="label">Ograniczenia</span>
+      <h2>Kiedy to nie zadziała idealnie</h2>
+      <ul>
+        <li>Film bez napisów nie zostanie przeanalizowany. Wtedy w mailu jest sam tytuł i link.</li>
+        <li>Zapowiedź z urywkami rozmowy brzmi jak zwykła rozmowa. Lokalny model rozpoznaje ją dobrze tylko wtedy, gdy twórca dodał rozdziały w opisie.</li>
+        <li>Reklamy w środku odcinka nie są wykrywane. Link pomija tylko to, co jest na początku.</li>
+        <li>Wykres „Najczęściej odtwarzane” YouTube pokazuje dopiero po kilku dniach, więc przy świeżych odcinkach dopisku 🔥 zwykle nie ma.</li>
+        <li>Streszczenia pisze model językowy. Zwykle są trafne, ale potrafi się pomylić, więc traktuj je jako wskazówkę.</li>
+      </ul>
+    </section>
+
+    <section>
+      <span class="label">Twórcy</span>
+      <h2>Fair play wobec twórców</h2>
+      <p>Link otwiera film na YouTube, więc reklamy platformy wyświetlają się normalnie, a wyświetlenie się liczy. Pomijasz tylko początek, na przykład reklamę sponsora czytaną przez prowadzącego. Jeśli lubisz jakiś kanał, kupuj przez linki i kody twórcy albo wspieraj go bezpośrednio.</p>
+    </section>
+  </main>
+</div>
+
+<div class="wrap">
+  <footer>Podcasty po reklamach · prywatny newsletter dla znajomych</footer>
+</div>
+</body>
+</html>
