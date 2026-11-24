@@ -162,8 +162,12 @@ footer { border-top: 1px solid var(--line); padding-block: 1.5rem 3rem; color: v
 }
 
 .channels { list-style: none; padding: 0; display: grid; gap: 0.6rem; }
-.channels li { display: grid; gap: 0.1rem; border-top: 1px solid var(--line); padding-top: 0.6rem; }
-.channels li span { color: var(--muted); font-size: 0.95rem; }
+.channels li { border-top: 1px solid var(--line); padding-top: 0.6rem; }
+.channels label { display: grid; grid-template-columns: 1.4rem 1fr; gap: 0.6rem; align-items: start; cursor: pointer; }
+.channels input { width: 1.15rem; height: 1.15rem; margin: 0.2rem 0 0; accent-color: var(--accent); cursor: pointer; }
+.channels label > span { display: grid; gap: 0.1rem; }
+.channels label > span > span { color: var(--muted); font-size: 0.95rem; }
+.btn[aria-disabled="true"] { opacity: 0.45; pointer-events: none; }
 .signup { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1.25rem; display: grid; gap: 0.6rem; }
 .signup .addr { font-family: var(--f-display); font-size: 1.2rem; font-weight: 500; }
 .signup .addr a { word-break: break-all; }
@@ -234,32 +238,27 @@ button.btn { font: inherit; font-weight: 600; border: 0; cursor: pointer; }
 
     <section>
       <span class="label">Zapis</span>
-      <h2>Jak się zapisać</h2>
+      <h2>Wybierz kanały i zapisz się</h2>
+      <p>Zaznacz podcasty, które Cię interesują. Mail przyjdzie tylko z odcinkami z tych kanałów, a w dni bez nowych odcinków nie przyjdzie wcale.</p>
+      <ul class="channels" id="channels">
+        <li><label for="ch-1"><input type="checkbox" id="ch-1" name="kanal" value="Przemek Górczyk Podcast" checked><span><strong>Przemek Górczyk Podcast</strong><span>długie rozmowy z ekspertami: zdrowie, nauka, technologia</span></span></label></li>
+        <li><label for="ch-2"><input type="checkbox" id="ch-2" name="kanal" value="Marcin Iwuć" checked><span><strong>Marcin Iwuć</strong><span>finanse osobiste, inwestowanie, IKE i IKZE</span></span></label></li>
+        <li><label for="ch-3"><input type="checkbox" id="ch-3" name="kanal" value="Good Times Bad Times Polska" checked><span><strong>Good Times Bad Times Polska</strong><span>gospodarka, geopolityka, historia</span></span></label></li>
+        <li><label for="ch-4"><input type="checkbox" id="ch-4" name="kanal" value="Strategy&amp;Future" checked><span><strong>Strategy&amp;Future</strong><span>geopolityka i strategia</span></span></label></li>
+        <li><label for="ch-5"><input type="checkbox" id="ch-5" name="kanal" value="Nie wiem, ale się dowiem!" checked><span><strong>Nie wiem, ale się dowiem!</strong><span>społeczeństwo, praca, pokolenia</span></span></label></li>
+        <li><label for="ch-6"><input type="checkbox" id="ch-6" name="kanal" value="Czasem czuły, czasem barbarzyńca" checked><span><strong>Czasem czuły, czasem barbarzyńca</strong><span>psychologia, relacje, męskość</span></span></label></li>
+      </ul>
+      <p>Lista nie jest zamknięta. Jeśli znasz ciekawy podcast na YouTube, napisz, a mogę go dodać.</p>
       <div class="signup">
-        <p class="addr">Napisz na <a href="mailto:podcast-digest@novvicki.pl?subject=Zapis%20na%20Samo%20sedno&amp;body=Cze%C5%9B%C4%87%2C%0D%0A%0D%0Achc%C4%99%20dostawa%C4%87%20codzienne%20podsumowania%20podcast%C3%B3w%20na%20ten%20adres.%0D%0A%0D%0AImi%C4%99%3A%20%0D%0A">podcast-digest@novvicki.pl</a>, a dopiszę Cię do listy.</p>
+        <p class="addr">Napisz na <a class="js-signup" href="mailto:podcast-digest@novvicki.pl?subject=Zapis%20na%20Samo%20sedno&amp;body=Cze%C5%9B%C4%87%2C%0D%0A%0D%0Achc%C4%99%20dostawa%C4%87%20codzienne%20podsumowania%20podcast%C3%B3w%20na%20ten%20adres.%0D%0A%0D%0AImi%C4%99%3A%20%0D%0A">podcast-digest@novvicki.pl</a>, a dopiszę Cię do listy.</p>
         <div class="actions">
-          <a class="btn" href="mailto:podcast-digest@novvicki.pl?subject=Zapis%20na%20Samo%20sedno&amp;body=Cze%C5%9B%C4%87%2C%0D%0A%0D%0Achc%C4%99%20dostawa%C4%87%20codzienne%20podsumowania%20podcast%C3%B3w%20na%20ten%20adres.%0D%0A%0D%0AImi%C4%99%3A%20%0D%0A">Zapisz się mailem</a>
-          <a class="btn btn-ghost" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=podcast-digest%40novvicki.pl&amp;su=Zapis%20na%20Samo%20sedno&amp;body=Cze%C5%9B%C4%87%2C%0A%0Achc%C4%99%20dostawa%C4%87%20codzienne%20podsumowania%20podcast%C3%B3w%20na%20ten%20adres.%0A%0AImi%C4%99%3A%20%0A" target="_blank" rel="noopener">Napisz przez Gmaila</a>
+          <a class="btn js-signup" id="btn-mailto" href="mailto:podcast-digest@novvicki.pl?subject=Zapis%20na%20Samo%20sedno&amp;body=Cze%C5%9B%C4%87%2C%0D%0A%0D%0Achc%C4%99%20dostawa%C4%87%20codzienne%20podsumowania%20podcast%C3%B3w%20na%20ten%20adres.%0D%0A%0D%0AImi%C4%99%3A%20%0D%0A">Zapisz się mailem</a>
+          <a class="btn btn-ghost" id="btn-gmail" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=podcast-digest%40novvicki.pl&amp;su=Zapis%20na%20Samo%20sedno&amp;body=Cze%C5%9B%C4%87%2C%0A%0Achc%C4%99%20dostawa%C4%87%20codzienne%20podsumowania%20podcast%C3%B3w%20na%20ten%20adres.%0A%0AImi%C4%99%3A%20%0A" target="_blank" rel="noopener">Napisz przez Gmaila</a>
           <button class="btn btn-ghost" type="button" id="copy-addr" data-addr="podcast-digest@novvicki.pl">Kopiuj adres</button>
         </div>
-        <p class="hint" id="copy-status" role="status" aria-live="polite">Przycisk „Zapisz się mailem” otwiera program pocztowy. Jeśli nic się nie dzieje, napisz przez Gmaila albo skopiuj adres.</p>
-        <p>Wypisać się możesz w każdej chwili, pisząc na ten sam adres.</p>
+        <p class="hint" id="copy-status" role="status" aria-live="polite">Zaznaczone kanały trafią do treści wiadomości. Jeśli „Zapisz się mailem” nic nie robi, napisz przez Gmaila albo skopiuj adres i wypisz kanały sam.</p>
+        <p>Zmienić kanały albo wypisać się możesz w każdej chwili, pisząc na ten sam adres. Każdy dostaje osobną wiadomość, więc nikt nie widzi adresów innych osób.</p>
       </div>
-      <p>Każdy dostaje osobną wiadomość, więc nikt nie widzi adresów innych osób. Mail przychodzi tylko w dni, w których pojawiły się nowe odcinki.</p>
-    </section>
-
-    <section>
-      <span class="label">Kanały</span>
-      <h2>Co obserwuję</h2>
-      <ul class="channels">
-        <li><strong>Przemek Górczyk Podcast</strong><span>długie rozmowy z ekspertami: zdrowie, nauka, technologia</span></li>
-        <li><strong>Marcin Iwuć</strong><span>finanse osobiste, inwestowanie, IKE i IKZE</span></li>
-        <li><strong>Good Times Bad Times Polska</strong><span>gospodarka, geopolityka, historia</span></li>
-        <li><strong>Strategy&amp;Future</strong><span>geopolityka i strategia</span></li>
-        <li><strong>Nie wiem, ale się dowiem!</strong><span>społeczeństwo, praca, pokolenia</span></li>
-        <li><strong>Czasem czuły, czasem barbarzyńca</strong><span>psychologia, relacje, męskość</span></li>
-      </ul>
-      <p>Lista nie jest zamknięta. Jeśli znasz ciekawy podcast na YouTube, napisz, a mogę go dodać. Wszyscy dostają ten sam zestaw kanałów.</p>
     </section>
 
     <section>
@@ -296,7 +295,7 @@ button.btn { font: inherit; font-weight: 600; border: 0; cursor: pointer; }
         <li><div><h3>Transkrypcja</h3><p>Pobieram napisy z YouTube, opis i rozdziały, i dzielę rozmowę na bloki po 30 sekund.</p></div></li>
         <li><div><h3>Początek rozmowy</h3><p>Model językowy ocenia każdy blok z pierwszych 12 minut: treść, zapowiedź, reklama, autopromocja albo czołówka. Start to pierwsze 3 minuty treści bez przerwy.</p></div></li>
         <li><div><h3>Streszczenie</h3><p>Na podstawie całej rozmowy powstaje streszczenie, ocena, czy tytuł i opis odpowiadają treści, i 3–6 najciekawszych momentów z czasem.</p></div></li>
-        <li><div><h3>Mail o 19:00</h3><p>Wszystkie nowe odcinki z danego dnia trafiają do jednego maila.</p></div></li>
+        <li><div><h3>Mail o 19:00</h3><p>Nowe odcinki z Twoich kanałów z danego dnia trafiają do jednego maila.</p></div></li>
       </ol>
     </section>
 
@@ -323,6 +322,35 @@ button.btn { font: inherit; font-weight: 600; border: 0; cursor: pointer; }
   <footer>Samo sedno · podcast digest</footer>
 </div>
 <script>
+(() => {
+  const ADDR = "podcast-digest@novvicki.pl";
+  const SUBJECT = "Zapis na Samo sedno";
+  const boxes = [...document.querySelectorAll('input[name="kanal"]')];
+  const status = document.getElementById("copy-status");
+  const defaultHint = status.textContent;
+
+  function body(nl) {
+    const chosen = boxes.filter(b => b.checked).map(b => b.value);
+    const list = chosen.length === boxes.length
+      ? "wszystkich kanałów"
+      : "tych kanałów:" + nl + chosen.map(c => "- " + c).join(nl);
+    return "Cześć," + nl + nl + "chcę dostawać podsumowania " + list + nl + nl + "Imię: " + nl;
+  }
+
+  function update() {
+    const none = !boxes.some(b => b.checked);
+    const mailto = "mailto:" + ADDR + "?subject=" + encodeURIComponent(SUBJECT) + "&body=" + encodeURIComponent(body("\r\n"));
+    const gmail = "https://mail.google.com/mail/?view=cm&fs=1&to=" + encodeURIComponent(ADDR) +
+      "&su=" + encodeURIComponent(SUBJECT) + "&body=" + encodeURIComponent(body("\n"));
+    document.querySelectorAll(".js-signup").forEach(a => a.href = mailto);
+    document.getElementById("btn-gmail").href = gmail;
+    ["btn-mailto", "btn-gmail"].forEach(id => document.getElementById(id).setAttribute("aria-disabled", none));
+    status.textContent = none ? "Zaznacz co najmniej jeden kanał." : defaultHint;
+  }
+
+  boxes.forEach(b => b.addEventListener("change", update));
+  update();
+})();
 document.getElementById("copy-addr").addEventListener("click", async (e) => {
   const addr = e.currentTarget.dataset.addr;
   const status = document.getElementById("copy-status");
