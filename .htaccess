@@ -1,0 +1,5 @@
+# Przekierowanie HTTP -> HTTPS na hostingu OVH (GitHub Pages ignoruje ten plik)
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
